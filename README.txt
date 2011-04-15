@@ -3,7 +3,7 @@ Contributors: popra
 Tags: social, social marketing, twitter, download, tweet to download, tweet to get it, auto tweet, auto follow  
 Requires at least: 3.0
 Tested up to: 3.1.1
-Stable tag: 1.2.1
+Stable tag: 1.2.1.1
 
 Tweet2Download allows a wordpress blog to require a tweet and a follow in exchange for the downloads available on the blog.
 
@@ -16,6 +16,7 @@ The plugin is well suited for blogs that offer ezines, software, code, design cr
 torrent files or any kind of download for that matter.
 
 **Requires:**
+
 PHP 5 or newer, Curl, tested with Wordpress 3.0 and newer
 
 **Usage:**

@@ -29,7 +29,7 @@
 
 Plugin Name: Tweet2Download
 Description: Tweet2Download allows a wordpress blog to require <strong>a tweet and a follow in exchange for a download</strong>. To get started: 1) Click the "Activate" link to the left of this description, 2) <a href="https://dev.twitter.com/apps/new" target="_blank">Sign up for a Twitter consumer key and secret</a>, 3) Enter the Twitter API key, consumer key and secret in your <a href="options-general.php?page=tweet2download">Tweet2Download configuration</a> page
-Version: 1.2.1
+Version: 1.2.1.1
 Author: Razvan Pop
 Plugin URI: http://inspiredcore.com/tweet2download-wordpress-plugin
 Author URI: http://twitter.com/popra
