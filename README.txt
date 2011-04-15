@@ -26,7 +26,7 @@ PHP 5 or newer, Curl, tested with Wordpress 3.0 and newer
 3. Select the file you previously uploaded, and click "Insert Tweet2Download button into Post"
 4. Change the shortcode to contain the tweet and follow you want, Publish!
 
-To get an idea about how the plugin works, go to the [Tweet2Download home page](http://inspiredcore.com/tweet2download-wordpress-pluging) 
+To get an idea about how the plugin works, go to the [Tweet2Download home page](http://inspiredcore.com/tweet2download-wordpress-plugin) 
 and give it a try!
 
 == Screenshots ==
