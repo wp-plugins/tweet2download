@@ -28,6 +28,12 @@ PHP 5 or newer, Curl, tested with Wordpress 3.0 and newer
 To get an idea about how the plugin works, go to the [Tweet2Download home page](http://inspiredcore.com/tweet2download-wordpress-pluging) 
 and give it a try!
 
+== Screenshots ==
+
+1. Uploading a file
+2. Inserting a file into the post
+3. The Tweet2Download button in action
+
 == Installation ==
 
 Same as the Akismet plugin, Tweet2Download requires an API key from Twitter to work. You can get the required 
