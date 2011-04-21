@@ -1,23 +1,21 @@
 === Plugin Name ===
 Contributors: popra
-Tags: social, social marketing, twitter, download, tweet to download, tweet to get it, auto tweet, auto follow  
+Tags: social, viral, social marketing, viral marketing, twitter, download, pay with a tweet, tweet to download, tweet and get it, auto tweet, auto follow, auto followers
 Requires at least: 3.0
 Tested up to: 3.1.1
-Stable tag: 1.2.1.1
+Stable tag: 1.3.0
 
-Tweet2Download allows a wordpress blog to require a tweet and a follow in exchange for the downloads available on the blog.
+Tweet2Download allows a wordpress blog to require a tweet and a follow in exchange for the downloads or article parts available on the blog.
 
 == Description ==
 
-If you have a blog that provides downloads, this plugin is the perfect twitter marketing tool for you. Tweet2Download allows
-you to require a tweet and a follow in exchange for a download on your blog.
+If you have a blog that provides downloads, this plugin is the perfect twitter marketing tool for you. [Tweet2Download](http://inspiredcore.com/tweet2download-wordpress-plugin) allows
+you to require a tweet and a follow in exchange for a download or a content snippet on your blog. It effectively asks your users to ["pay" with a tweet](http://inspiredcore.com/tweet2download-wordpress-plugin) for free content on your blog, making it a very powerfull viral marketing tool. 
 
-The plugin is well suited for blogs that offer ezines, software, code, design creatives, tutorials, audio files, videos, 
-torrent files or any kind of download for that matter.
+The plugin is well suited for blogs that offer music, videos, tips & tricks, ezines, software, code, design creatives, tutorials, torrent files, download links or any kind of downloads/content for that matter. 
 
 **Requires:**
-
-PHP 5 or newer, Curl, tested with Wordpress 3.0 and newer
+PHP 5.2 or newer, cURL, tested with Wordpress 3.0 and newer
 
 **Usage:**
 
@@ -26,7 +24,7 @@ PHP 5 or newer, Curl, tested with Wordpress 3.0 and newer
 3. Select the file you previously uploaded, and click "Insert Tweet2Download button into Post"
 4. Change the shortcode to contain the tweet and follow you want, Publish!
 
-To get an idea about how the plugin works, go to the [Tweet2Download home page](http://inspiredcore.com/tweet2download-wordpress-plugin) 
+For more information and to get an idea about how the plugin works, go to the [Tweet2Download home page](http://inspiredcore.com/tweet2download-wordpress-plugin) 
 and give it a try!
 
 == Screenshots ==
@@ -49,5 +47,18 @@ To install the Tweet2Download Wordpress Plugin, follow these steps:
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Create a Twitter App for your blog [here](https://dev.twitter.com/apps/new), for more information on how to do this see the [documentation](http://inspiredcore.com/twitter-app-setup-for-tweet2download)
 4. Go to the plugin setup page (wp-admin -> Settings -> Tweet2Download Settings) and fill in the Twitter App info
-5. Upload the file you wish to provide using the Tweet2Download button (wp-admin -> Media -> Add New), make sure to tick "These files will be downloaded using Tweet2Download"
-6. Use the short code, to place the Tweet2Download button in your post 
+
+== Changelog ==
+
+= 1.3.0 =
+* plugin is now able to reveal hidden content on the page in exchange for a tweet and a follow
+* added ability to customize the Tweet2Download button with the [tweet2downloadhtml] shortcode
+* some bugfixes 
+
+= 1.2.1 =
+* First public release
+
+== Upgrade Notice ==
+
+= 1.3 =
+You can customize the Tweet2Download button, additionally, instead of downloads you can now also provide post/page parts in exchange for a tweet and a download.

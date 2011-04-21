@@ -29,13 +29,13 @@
 
 Plugin Name: Tweet2Download
 Description: Tweet2Download allows a wordpress blog to require <strong>a tweet and a follow in exchange for a download</strong>. To get started: 1) Click the "Activate" link to the left of this description, 2) <a href="https://dev.twitter.com/apps/new" target="_blank">Sign up for a Twitter consumer key and secret</a>, 3) Enter the Twitter API key, consumer key and secret in your <a href="options-general.php?page=tweet2download">Tweet2Download configuration</a> page
-Version: 1.2.1.1
+Version: 1.3.0
 Author: Razvan Pop
 Plugin URI: http://inspiredcore.com/tweet2download-wordpress-plugin
 Author URI: http://twitter.com/popra
 */
 
-global $t2d_shortcodes;
+global $t2d_shortcodes, $t2d_html;
 $t2d_uploads_dir = wp_upload_dir();
 
 define('T2D_LIBS_FOLDER', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'libs');
@@ -51,9 +51,12 @@ add_action('admin_init', 't2d_register_settings');
 add_action('admin_notices', 't2d_admin_notices');
 
 if ((trim(get_option('t2d_twitter_consumersecret', '')) != '') 
-	&& (trim(get_option('t2d_twitter_consumerkey', '')) != '')) {
+	&& (trim(get_option('t2d_twitter_consumerkey', '')) != '')
+	&& t2d_requirements_ok()) {
 		
 	// add hooks and filters only when we're set
+	
+	add_action('wp_print_scripts', 't2d_scripts' );
 	add_action('post-flash-upload-ui', 't2d_post_upload_ui');
 	add_action('post-html-upload-ui', 't2d_post_html_upload_ui');
 	add_filter('wp_handle_upload', 't2d_handle_upload', 0);
@@ -72,6 +75,23 @@ if ((trim(get_option('t2d_twitter_consumersecret', '')) != '')
 	add_shortcode('tweet2download', 't2d_shortcode');
 }
 
+function t2d_requirements_ok() {
+	list($major, $mid, ) = explode('.', phpversion());
+	
+	if (($mid < 2) || ($major < 5)) {
+		return false;
+	} 
+	
+	if (!function_exists("curl_init")) {
+		return false;
+	}
+	return true;
+}
+
+function t2d_scripts() {
+	wp_enqueue_script( 'tweet2download_script', get_bloginfo('url').'/wp-content/plugins/tweet2download/js/tweet2download.js', array( 'jquery'));
+}
+
 /*
  * save 
  */
@@ -81,7 +101,8 @@ function t2d_wp_insert_post($post_id, $data) {
 	
 	$t2d_shortcodes = array();
 	
-	remove_all_shortcodes();
+	//remove_all_shortcodes();
+	remove_shortcode('tweet2download');
 	add_shortcode('tweet2download', 't2d_shortcode_insert');
 	do_shortcode($data->post_content);
 	remove_shortcode('tweet2download');
@@ -91,7 +112,19 @@ function t2d_wp_insert_post($post_id, $data) {
 
 function t2d_shortcode_insert($attrs, $content=null) {
 	global $t2d_shortcodes;
+	
+	if ($content != null) {
+		remove_shortcode('tweet2downloadhtml');
+		add_shortcode('tweet2downloadhtml', 't2d_shortcode_html_insert');
+		$content = do_shortcode($content);
+		remove_shortcode('tweet2downloadhtml');
+	}
+	
 	$t2d_shortcodes[] = array('attrs' => $attrs, 'content' => $content);
+	return '';
+}
+
+function t2d_shortcode_html_insert($attrs, $content=null) {
 	return '';
 }
 
@@ -109,6 +142,17 @@ function t2d_media_buttons_context($html) {
 }
 
 function t2d_admin_notices() {
+	
+	if (!t2d_requirements_ok()) {
+        echo '<div class="error fade" style="background-color:red;"><p><strong>Tweet2Download requires PHP 5.2 or newer and cURL. Most web hosting services should have these, you might want to consider changing web hosting providers. You can find a cool one <a href="http://www.dreamhost.com/r.cgi?139477">here</a>, and we\'ll even give you a <a href="http://inspiredcore.com/freebie-massive-dreamhost-web-hosting-discount-coupon">discount code</a>.</strong></p></div>';
+        return;
+	}
+	
+	if ((trim(get_option('t2d_twitter_consumersecret', '')) == '') 
+		|| (trim(get_option('t2d_twitter_consumerkey', '')) == '')) {
+        echo '<div class="error fade" style="background-color:yellow;"><p><strong>'.('Tweet2Download needs your attention.').'</strong> Go to the <a href="options-general.php?page=tweet2download">Tweet2Download Settings</a> page to complete the install. </p></div>';
+	}	
+	
 	if (!is_dir(T2D_UPLOADS_FOLDER)) {
 		$uploads_dir = wp_upload_dir();
         echo '<div class="error fade" style="background-color:red;"><p><strong>'.('An upload folder for Tweet2Download could not be created. Please manualy create a writeable folder called "social2download" (without the quotes) under your uploads folder which is '.$uploads_dir.'').'</strong></p></div>';
@@ -122,6 +166,9 @@ function t2d_admin_notices() {
 }
 
 function t2d_activate() {
+	
+	
+	
 	mt_srand();
 	add_option('t2d_secret', md5(microtime().mt_rand()));
 	add_option('t2d_twitter_apikey', '');
@@ -157,7 +204,7 @@ function t2d_register_settings() {
 }
 
 function t2d_twittersection() {
-	echo '<p>You can obtain a Twitter API key, Consumer key and Consumer secret from <a href="https://dev.twitter.com/apps/new" target="_blank">here</a>.</p>';
+	echo '<p>You can obtain a Twitter API key, Consumer key and Consumer secret from <a href="https://dev.twitter.com/apps/new" target="_blank">here</a>. If you need help obtaining these, please check out our <a href="http://inspiredcore.com/twitter-app-setup-for-tweet2download">documentation</a>.</p>';
 }
 
 function t2d_inputtext($args) {
@@ -269,8 +316,14 @@ function is_tweet2download_attachment($id) {
 	return false;
 }
 
+function t2d_shortcode_html($attrs, $content = null) {
+	global $t2d_html;
+	$t2d_html = $content;
+	return '';
+}
+
 function t2d_shortcode($attrs, $content = null) {
-	global $t2d_shortcodes;
+	global $t2d_shortcodes, $t2d_html;
 	
 	$post_id = get_the_ID();
 	$t2d_shortcodes[$post_id][] = $attrs;
@@ -278,10 +331,6 @@ function t2d_shortcode($attrs, $content = null) {
 	$tmp = get_post_meta($post_id, 'tweet2download_post_shortcodes', true);
 	$attrs = $tmp[$shortcode_index];
 	$attrs = $attrs['attrs'];
-	
-	if (!isset($attrs['file'])) {
-		return 'tweet2download error: "file" attribute missing. eg. [tweet2download file="my-file.zip" tweet="I\'ve downloaded a file from %%post-url%%" follow="@batman"]';
-	}
 	
 	if (!isset($attrs['tweet'])) {
 		return 'tweet2download error: "tweet" attribute missing. eg. [tweet2download file="my-file.zip" tweet="I\'ve downloaded a file from %%post-url%%" follow="@batman"]';
@@ -291,20 +340,43 @@ function t2d_shortcode($attrs, $content = null) {
 		return 'tweet2download error: "follow" attribute missing. eg. [tweet2download file="my-file.zip" tweet="I\'ve downloaded a file from %%post-url%%" follow="@batman"]';
 	}
 	
-	if (!is_tweet2download_attachment($attrs['file']) && !is_tweet2download_file(T2D_UPLOADS_FOLDER.'/'.$attrs['file'])) {
-		return '[tweet2download error: file "'.htmlentities($attrs['file']).'" is not a Tweet2Download file.]';
+	$file = null;
+	if (isset($attrs['file'])) {
+		if (!is_tweet2download_attachment($attrs['file']) && !is_tweet2download_file(T2D_UPLOADS_FOLDER.'/'.$attrs['file'])) {
+			return '[tweet2download error: file "'.htmlentities($attrs['file']).'" is not a Tweet2Download file.]';
+		}
+		
+		if (is_numeric($attrs['file'])) {
+			$file = get_attached_file($attrs['file']);
+		} else {
+			$file = $attrs['file'];
+		}
 	}
 	
-	if (is_numeric($attrs['file'])) {
-		$file = get_attached_file($attrs['file']);
-	} else {
-		$file = $attrs['file'];
+	$t2d_html = null;
+	if ($content != null) {
+		add_shortcode("tweet2downloadhtml", "t2d_shortcode_html");
+		do_shortcode($content);
+		remove_shortcode("tweet2downloadhtml");
 	}
-	
 	
 	$script = "w=800;h=560;l=parseInt((screen.availWidth/2)-(w/2));t=parseInt((screen.availHeight/2)-(h/2));window.open('".t2d_download_url($post_id, $shortcode_index)."', 'open_window', 'location, directories, status, scrollbars, resizable, dependent, width='+w+', height='+h+', left='+l+', top='+t+'');return false;";
 	
-	return "<a style=\"background-image:url(".T2D_IMAGES_URL."t2d.png);display:block;height:26px;width:160px;padding-top:36px;padding-left:48px;font-size:11px;color:#80b4f1;font-family:Arial,Helvetica,sans-serif;\" onclick=\"".$script."\" target=\"_blank\" href=\"".t2d_download_url($post_id, $shortcode_index)."\" title=\"Download " . basename($file) . " using Tweet2Download\">" . t2d_preety_filename(basename($file)) . "</a>";
+	$hidden = '<p id="tweet2download-'.$post_id.'-'.$shortcode_index.'" style="display:none;"></p>';
+	if ($t2d_html != null) {
+		// $t2d_html can be modified in do_shortcode() by t2d_shortcode_html();
+		$t2d_html = str_replace('%%tweet2download-href%%', htmlentities(t2d_download_url($post_id, $shortcode_index), ENT_COMPAT, 'UTF-8'), $t2d_html);
+		$t2d_html = str_replace('%%tweet2download-onclick%%', $script, $t2d_html);
+		$t2d_html = str_replace('%%tweet2download-filename%%', htmlentities(basename($file), ENT_COMPAT, 'UTF-8'), $t2d_html);
+		$t2d_html = str_replace('%%tweet2download-preetyfilename%%', htmlentities(t2d_preety_filename(basename($file)), ENT_COMPAT, 'UTF-8'), $t2d_html);
+		return $t2d_html.$hidden;
+	}
+	
+	if (!is_null($file)) {
+		return "<a style=\"background-image:url(".T2D_IMAGES_URL."t2d.png);display:block;height:26px;width:160px;padding-top:36px;padding-left:48px;font-size:11px;color:#80b4f1;font-family:Arial,Helvetica,sans-serif;\" onclick=\"".$script."\" target=\"_blank\" href=\"".t2d_download_url($post_id, $shortcode_index)."\" title=\"Download " . basename($file) . " using Tweet2Download\">" . t2d_preety_filename(basename($file)) . "</a>";
+	} else {
+		return "<a style=\"background-image:url(".T2D_IMAGES_URL."t2d.png);display:block;height:26px;width:160px;padding-top:36px;padding-left:48px;font-size:11px;color:#80b4f1;font-family:Arial,Helvetica,sans-serif;\" onclick=\"".$script."\" target=\"_blank\" href=\"".t2d_download_url($post_id, $shortcode_index)."\" title=\"View hidden content using Tweet2Download\">Show me the hidden content!</a>".$hidden;
+	}
 }
 
 function t2d_download_url($post_id, $shortcode_index) {
@@ -431,24 +503,23 @@ function t2d_get_shortcode($shortcode_id) {
 	
 	$shortcode = $meta[$shortcode_index];
 	
-	if (!isset($shortcode['attrs']['file'])) {
-		return false;
-	}
+	if (isset($shortcode['attrs']['file'])) {
 	
-	if (is_numeric($shortcode['attrs']['file']) 
-		&& is_tweet2download_attachment($shortcode['attrs']['file'])) {
-			
-		$attachment = get_post($shortcode['attrs']['file']);
-		$attachment->file_path = get_attached_file($shortcode['attrs']['file']);
-	} else if (is_string($shortcode['attrs']['file'])) {
-		$attachment_path = realpath(T2D_UPLOADS_FOLDER . '/' . $shortcode['attrs']['file']);
-		if (!is_tweet2download_file($attachment_path)) {
+		if (is_numeric($shortcode['attrs']['file']) 
+			&& is_tweet2download_attachment($shortcode['attrs']['file'])) {
+				
+			$attachment = get_post($shortcode['attrs']['file']);
+			$attachment->file_path = get_attached_file($shortcode['attrs']['file']);
+		} else if (is_string($shortcode['attrs']['file'])) {
+			$attachment_path = realpath(T2D_UPLOADS_FOLDER . '/' . $shortcode['attrs']['file']);
+			if (!is_tweet2download_file($attachment_path)) {
+				return false;
+			}
+			$attachment = new stdClass();
+			$attachment->file_path = $attachment_path;
+		} else {
 			return false;
 		}
-		$attachment = new stdClass();
-		$attachment->file_path = $attachment_path;
-	} else {
-		return false;
 	}
 	
 	$shortcode['post'] = get_post($post_id);
