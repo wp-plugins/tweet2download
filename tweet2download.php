@@ -57,8 +57,12 @@ if ((trim(get_option('t2d_twitter_consumersecret', '')) != '')
 	// add hooks and filters only when we're set
 	
 	add_action('wp_print_scripts', 't2d_scripts' );
-	add_action('post-flash-upload-ui', 't2d_post_upload_ui');
+	add_action('post-flash-upload-ui', 't2d_post_flash_upload_ui');
 	add_action('post-html-upload-ui', 't2d_post_html_upload_ui');
+        add_action('post-plupload-upload-ui', 't2d_post_plupload_upload_ui');
+        
+        add_filter('upload_post_params', 't2d_upload_post_params');
+        
 	add_filter('wp_handle_upload', 't2d_handle_upload', 0);
 	add_filter('wp_get_attachment_url', 't2d_get_attachment_url', 20, 2);
 	add_filter('upload_dir', 't2d_upload_dir', 20);
@@ -138,7 +142,7 @@ function t2d_admin_url($url, $path, $blog_id) {
 
 function t2d_media_buttons_context($html) {
 	add_filter('admin_url', 't2d_admin_url', 10, 3);
-	return $html . _media_button(__('Add Tweet2Download Button'), '[tweet2download-media-icon]', 'media');
+	return $html . _media_button(__('Add Tweet2Download Button'), '[tweet2download-media-icon]', 'media', 't2d');
 }
 
 function t2d_admin_notices() {
@@ -231,11 +235,15 @@ function t2d_settings_page() {
 <?php 
 }
 
+function t2d_upload_post_params($post_params) {
+    
+    return $post_params;
+}
 
-function t2d_post_upload_ui() {
+function t2d_post_flash_upload_ui() {
 	echo '
 		<script type="text/javascript">
-			function t2d_toggle(e) {
+			function t2d_toggle_flash(e) {
 				if (e.checked) {
 					swfu.addPostParam("is_t2d_upload", "true");
 				} else {
@@ -243,13 +251,28 @@ function t2d_post_upload_ui() {
 				}
 			}
 		</script>
-		<label><input type="checkbox" onclick="t2d_toggle(this)"> These files will be downloaded using Tweet2Download</label>
+		<label><input type="checkbox" onclick="t2d_toggle_flash(this)"> These files will be downloaded using Tweet2Download</label>
 	';
 }
 
 function t2d_post_html_upload_ui() {
 	echo '
 		<label><input type="checkbox" name="is_t2d_upload" value="true" /> This file will be downloaded using Tweet2Download</label>
+	';
+}
+
+function t2d_post_plupload_upload_ui() {
+	echo '
+		<script type="text/javascript">
+			function t2d_toggle_plupload(e) {
+				if (e.checked) {
+					uploader.settings["multipart_params"]["is_t2d_upload"] = "true";
+				} else {
+					uploader.settings["multipart_params"]["is_t2d_upload"] = "false";
+				}
+			}
+		</script>
+		<label><input type="checkbox" onclick="t2d_toggle_plupload(this)"> These files will be downloaded using Tweet2Download</label>
 	';
 }
 
@@ -301,7 +324,9 @@ function is_tweet2download_file($file) {
 }
 
 function is_tweet2download_upload() {
-	if (isset($_POST['is_t2d_upload'])) {
+	if (isset($_POST['is_t2d_upload'])
+                && ($_POST['is_t2d_upload'] == "true")) 
+        {
 		return true;
 	}
 	return false;
