@@ -2,8 +2,8 @@
 Contributors: popra
 Tags: social, viral, social marketing, viral marketing, twitter, download, pay with a tweet, tweet to download, tweet and get it, auto tweet, auto follow, auto followers
 Requires at least: 3.0
-Tested up to: 3.1.1
-Stable tag: 1.3.0
+Tested up to: 3.3.0
+Stable tag: 1.4.0
 
 Tweet2Download allows a wordpress blog to require a tweet and a follow in exchange for the downloads or article parts available on the blog.
 
@@ -49,6 +49,10 @@ To install the Tweet2Download Wordpress Plugin, follow these steps:
 4. Go to the plugin setup page (wp-admin -> Settings -> Tweet2Download Settings) and fill in the Twitter App info
 
 == Changelog ==
+
+= 1.4.0 =
+* fixed compatibility issues with Wordpress 3.3
+* adjusted settings page to reflect Twitter APP changes
 
 = 1.3.0 =
 * plugin is now able to reveal hidden content on the page in exchange for a tweet and a follow
