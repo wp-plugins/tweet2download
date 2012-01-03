@@ -3,7 +3,7 @@ Contributors: popra
 Tags: social, viral, social marketing, viral marketing, twitter, download, pay with a tweet, tweet to download, tweet and get it, auto tweet, auto follow, auto followers
 Requires at least: 3.0
 Tested up to: 3.3.0
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 
 Tweet2Download allows a wordpress blog to require a tweet and a follow in exchange for the downloads or article parts available on the blog.
 
